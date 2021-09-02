@@ -724,7 +724,8 @@ main.o: ../openpcap/main.cpp /opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/QCoreAppli
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qset.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontiguouscache.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer_impl.h
+		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../openpcap/print.cpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../openpcap/main.cpp
 
 ####### Install
