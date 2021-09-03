@@ -16,6 +16,7 @@ void printdec(FILE *fptr,int &k,int n,const u_char* pkt_data)
     fprintf(fptr,",");
     printf("\n");
     k+=n;
+    return;
 }
 
 void printhex(FILE *fptr,int &k,int n,const u_char* pkt_data)
@@ -29,6 +30,7 @@ void printhex(FILE *fptr,int &k,int n,const u_char* pkt_data)
     fprintf(fptr,",");
     printf("\n");
     k+=n;
+    return;
 }
 
 void printchar(FILE *fptr,int &k,int n,const u_char* pkt_data)
@@ -45,58 +47,83 @@ void printchar(FILE *fptr,int &k,int n,const u_char* pkt_data)
     fprintf(fptr,",");
     printf("\n");
     k+=n;
+    return;
 }
 
 void printName(FILE *fptr,int &k,int n,const u_char* pkt_data)
 {
     printf(" : ");
+    char temp[100];
     for(int i=0;i<n;i++)
     {
-        if(pkt_data[i+k] & 0x80)
+        /*if(pkt_data[i+k] & 0x80)
         {
-            wstring word;
+            /*
+            char word[2];
+            strcpy(word,(char*)pkt_data[i+k]);
+            strcat(word,(char*)pkt_data[i+k+1]);
+            fprintf(fptr,"__");
+            printf("%s",word);
+            i++;
+                */
+            /*wstring word;
             word+=pkt_data[i+k];
             word+=pkt_data[i+k+1];
-            wcout<<word;
-            //cout<<pkt_data[i+k]<<pkt_data[i+k+1];
-            /*setlocale(LC_CTYPE,"zh_TW.UTF-8");
-            const char *word = new char[2];
-            word[0]=pkt_data[i+k];
-            word[1]=pkt_data[i+k]+1;
-            int wsize = strlen(word)+1;
-            wchar_t *wword = new wchar_t[wsize];
-            int ret = mbsrtowcs(wword,word,wsize);
-            cout<<wword[0];*/
-            //fwprintf(fptr,L"%s",word.c_str());
+            wcout<<word;*/
+            /*printf("\'%d %d\'",pkt_data[i+k],pkt_data[i+k+1]);
             fprintf(fptr,"__");
             i++;
         }
         else
         {
             fprintf(fptr,"%c",pkt_data[i+k]);
-            printf("%c",pkt_data[i+k]);
-        }
-
+            printf("\"%d\"",pkt_data[i+k]);
+        }*/
+        temp[i]=pkt_data[i+k];
     }
+    temp[n]='\0';
+    fprintf(fptr,"%s",temp);
+    printf("%s",temp);
     fprintf(fptr,",");
     printf("\n");
     k+=n;
+    return;
 }
-void printBCD(FILE *fptr,int &k,int n,const u_char* pkt_data)
+
+
+int BCDMask(int &k,int n,const u_char* pkt_data)
 {
     printf(" : ");
     int d = 0;
     for(int i=0;i<n;i++)
     {
-        //fprintf(fptr,"%02x",pkt_data[i+k]);
         d=d*100+(pkt_data[i+k]/16)*10+((pkt_data[i+k]%16));
-        //printf("%02x",pkt_data[i+k]);
     }
-    //printf("\n");
-    /*double f = (double)d/1000;
-    printf("float Num : %6.3f\n",f);
-    fprintf(fptr,"%6.3f,",f);*/
-    printf("%d\n",d);
-    fprintf(fptr,"%d,",d);
     k+=n;
+    return d;
 }
+
+void printBCD
+(FILE *fptr,int d)
+{
+    printf(" : %d\n",d);
+    fprintf(fptr,"%d,",d);
+    return;
+}
+
+void printFPF(FILE *fptr,int d)
+{
+    double f = (double)d/10000;
+    printf("%5.4f\n",f);
+    fprintf(fptr,"%5.4f,",f);
+    return;
+}
+
+void printSPF(FILE *fptr,int d)
+{
+    double f = (double)d/10000;
+    printf("%6.4f\n",f);
+    fprintf(fptr,"%6.4f,",f);
+    return;
+}
+

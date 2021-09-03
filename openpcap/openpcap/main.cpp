@@ -4,6 +4,10 @@
 #include <pcap.h>
 #include <fstream>
 #include "print.cpp"
+#include "format01.cpp"
+#include "format21.cpp"
+#include "format22.cpp"
+
 using namespace std;
 void Head(int *th,const u_char* pkt_data)
 {
@@ -43,160 +47,91 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     char errbuf[PCAP_ERRBUF_SIZE];
     qDebug()<<"Hi";
-    pcap_t *fin = pcap_open_offline("/root/20210823/p1p1.pcap", errbuf);
-    if(!fin)
+    int x=1,y=1,z=0;
+    char oriroot[] = "/root/20210823/p";
+    char buffer[32];
+    char root[60];
+    FILE *fptr01 = fopen("/root/20210823/Format01.csv","w");
+    FILE *fptr21 = fopen("/root/20210823/Format21.csv","w");
+    FILE *fptr22 = fopen("/root/20210823/Format22.csv","w");
+    while(x<=3)
     {
-        qDebug()<<"error : "<<errbuf;
-    }
-    else
-    {
-        qDebug()<<"Load file success";
-        FILE *fptr = fopen("/root/20210823/p1p1.csv","w");
-        struct pcap_pkthdr *header;
-        const u_char *pkt_data;
-        int res;
-        int w=0;
-        while(res = pcap_next_ex(fin,&header,&pkt_data) >=0)
+        strcpy(root,oriroot);
+        sprintf(buffer,"%d",x);
+        strcat(root,buffer);
+        strcat(root,"p");
+        sprintf(buffer,"%d",y);
+        strcat(root,buffer);
+        strcat(root,".pcap");
+        if(z!=0)
         {
-            int h = 42;
-            if(pkt_data[h]==27)
+            sprintf(buffer,"%d",z);
+            strcat(root,buffer);
+        }
+        pcap_t *fin = pcap_open_offline( root, errbuf);
+        if(!fin)
+        {
+            printf("%s not exist\n",root);
+            z=0;
+            if(x==1 && y==2)
             {
-                int TH[6]; //TWSE_HEADER
-                Head(TH,pkt_data);
-                for(int i=0;i<6;i++)
-                {
-                    printf("%d ",TH[i]);
-                }
-                printf("\n");
-                if(TH[1]==114)
-                {
-                    int i=42;
-                    for(;i<header->caplen;i++)
-                    {
-                        printf("%3d:%02x ",i-41,pkt_data[i]);
-                        if((i-41)%5==0)
-                            printf("\n");
-                    }
-                    cout<<endl;
-                    /*cout<<i-42<<endl;
-                    int seek = 0;*/
-                    //TWSE_Header *data = (TWSE_Header*)(pkt_data + h + seek);
-                    //qDebug()<<data->code;
-
-                    int k=42;
-                    //0Esc-Code
-                    printf("Esc-code");
-                    printdec(fptr,k,1,pkt_data);
-
-                    //1MessageLen
-                    printf("Message Length");
-                    printhex(fptr,k,2,pkt_data);
-
-                    //3MessageType
-                    printf("Message Type");
-                    printhex(fptr,k,1,pkt_data);
-
-                    //4MessageCode
-                    printf("Message Code");
-                    printhex(fptr,k,1,pkt_data);
-
-                    //5MessageVersion
-                    printf("Message Version");
-                    printhex(fptr,k,1,pkt_data);
-
-                    //6MessageSeq
-                    printf("Message Sequence Number");
-                    printhex(fptr,k,4,pkt_data);
-
-                    //10StockCode
-                    printf("Stock Code");
-                    printchar(fptr,k,6,pkt_data);
-
-                    //16StockName
-                    printf("Stock Name");
-                    printName(fptr,k,16,pkt_data);
-
-                    //32StockInd
-                    printf("Stock Industry");
-                    printchar(fptr,k,2,pkt_data);
-
-                    //34StockType
-                    printf("Stock Type");
-                    printchar(fptr,k,2,pkt_data);
-
-                    //36Stocktrans
-                    printf("Stock Transaction");
-                    printchar(fptr,k,2,pkt_data);
-
-                    //38StockExecption
-                    printf("Stock Exception");
-                    printhex(fptr,k,1,pkt_data);
-
-                    //39StockNote
-                    printf("Stock Note");
-                    printchar(fptr,k,1,pkt_data);
-
-                    //40BoardNote
-                    printf("Board Node");
-                    printhex(fptr,k,1,pkt_data);
-
-                    //41ReferencePrice
-                    printf("Reference Price");
-                    printBCD(fptr,k,5,pkt_data);
-
-                    //46Limitup
-                    printf("Limit Up");
-                    printBCD(fptr,k,5,pkt_data);
-
-                    //51DownLimit
-                    printf("Down Limit");
-                    printBCD(fptr,k,5,pkt_data);
-
-                    //56TenDoller
-                    printf("Not 10 TWD");
-                    printchar(fptr,k,1,pkt_data);
-
-                    //57RecommandExecption
-                    printf("Recommand Exception");
-                    printchar(fptr,k,1,pkt_data);
-
-                    //58PriExecption
-                    printf("Privileged Exception");
-                    printchar(fptr,k,1,pkt_data);
-
-                    //59Daytrade
-                    printf("Daytrade");
-                    printchar(fptr,k,1,pkt_data);
-
-                    //60FlatSell
-                    printf("Flat Sell");
-                    printchar(fptr,k,1,pkt_data);
-
-                    printf("%02x\n",pkt_data[k]);
-                    if(pkt_data[k]!=0x00)
-                        system("Pause");
-                    /*//61FlatBarrow
-                    printf("Flat Borrow");
-                    printchar(fptr,k,1,pkt_data);
-
-
-                    //62StockSec
-                    printf("Stock Second");
-                    printhex(fptr,k,3,pkt_data);*/
-
-
-                    fprintf(fptr,"\n");
-                    printf("Len : %d\n",header->caplen-42);
-                    printf("\n");
-                }
-                w++;
-                /*if(w>20)
-                    break;*/
+                x=3;
+                y=1;
+            }
+            else if(y==1)
+            {
+                y++;
+            }
+            else
+            {
+                break;
             }
         }
-        fclose(fptr);
+        else
+        {
+            printf("Load %s success\n",root);
+
+            z++;
+
+            struct pcap_pkthdr *header;
+            const u_char *pkt_data;
+            int res;
+            int w=0;
+            while(res = pcap_next_ex(fin,&header,&pkt_data) >=0)
+            {
+                int h = 42;
+                if(pkt_data[h]==27)
+                {
+                    int TH[6]; //TWSE_HEADER
+                    Head(TH,pkt_data);
+                    /*for(int i=0;i<6;i++)
+                    {
+                        printf("%d ",TH[i]);
+                    }
+                    printf("\n");*/
+                    if(TH[1]==114 && TH[3]==1)
+                    {
+                        format01(header,pkt_data,fptr01);
+                    }
+                    else if(TH[1]==116 &&TH[3]==21)
+                    {
+                        format21(header,pkt_data,fptr21);
+                    }
+                    else if(TH[1]==60 &&TH[3]==22)
+                    {
+                        format22(header,pkt_data,fptr22);
+                    }
+                    w++;
+                    /*if(w>500)
+                        break;*/
+                }
+            }
+            pcap_close(fin);
+        }
     }
+    fclose(fptr01);
+    fclose(fptr21);
+    fclose(fptr22);
     printf("Done\n");
-    pcap_close(fin);
     return a.exec();
 }
