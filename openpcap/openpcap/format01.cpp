@@ -1,171 +1,130 @@
+#include <pthread.h>
+extern pthread_mutex_t mutex01;
 void format01(struct pcap_pkthdr *header,const u_char *pkt_data,FILE *fptr)
 {
-    /*for(int i=42;i<header->caplen;i++)
-    {
-        printf("%3d:%02x ",i-41,pkt_data[i]);
-        if((i-41)%5==0)
-            printf("\n");
-    }
-    cout<<endl;
-    */
 
     int k=42;
+    char outbuffer[500]="";
 
     //0Esc-Code
-    printf("Esc-code");
-    printdec(fptr,k,1,pkt_data);
+    printdec(k,1,pkt_data,outbuffer);
 
     //1MessageLen
-    printf("Message Length");
-    printhex(fptr,k,2,pkt_data);
+    printhex(k,2,pkt_data,outbuffer);
 
     //3MessageType
-    printf("Message Type");
-    printhex(fptr,k,1,pkt_data);
+    printhex(k,1,pkt_data,outbuffer);
 
     //4MessageCode
-    printf("Message Code");
-    printhex(fptr,k,1,pkt_data);
+    printhex(k,1,pkt_data,outbuffer);
 
     //5MessageVersion
-    printf("Message Version");
-    printhex(fptr,k,1,pkt_data);
+    printhex(k,1,pkt_data,outbuffer);
 
     //6MessageSeq
-    printf("Message Sequence Number");
-    printhex(fptr,k,4,pkt_data);
+    printhex(k,4,pkt_data,outbuffer);
 
     //10StockCode
-    printf("Stock Code");
-    printchar(fptr,k,6,pkt_data);
+    printchar(k,6,pkt_data,outbuffer);
 
     //16StockName
-    printf("(%d)Stock Name",k-42);
-    printName(fptr,k,16,pkt_data);
+    printName(k,16,pkt_data,outbuffer);
 
     //32StockInd
-    printf("(%d)Stock Industry",k-42);
-    printchar(fptr,k,2,pkt_data);
+    printchar(k,2,pkt_data,outbuffer);
 
     //34StockType
-    printf("(%d)Stock Type",k-42);
-    printchar(fptr,k,2,pkt_data);
+    printchar(k,2,pkt_data,outbuffer);
 
     //36Stocktrans
-    printf("(%d)Stock Transaction",k-42);
-    printchar(fptr,k,2,pkt_data);
+    printchar(k,2,pkt_data,outbuffer);
 
     //38StockExecption
-    printf("(%d)Stock Exception",k-42);
-    printhex(fptr,k,1,pkt_data);
-
+    printhex(k,1,pkt_data,outbuffer);
 
     //39BoardNote
-    printf("(%d)Board Node",k-42);
-    //printhex(fptr,k,1,pkt_data);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //40ReferencePrice
-    printf("(%d)Reference Price",k-42);
-    printFPF(fptr,BCDMask(k,5,pkt_data));
+    printFPF(BCDMask(k,5,pkt_data),outbuffer);
 
     //45Limitup
-    printf("(%d)Limit Up",k-42);
-    printFPF(fptr,BCDMask(k,5,pkt_data));
+    printFPF(BCDMask(k,5,pkt_data),outbuffer);
 
     //50DownLimit
-    printf("(%d)Down Limit",k-42);
-    printFPF(fptr,BCDMask(k,5,pkt_data));
+    printFPF(BCDMask(k,5,pkt_data),outbuffer);
 
     //55TenDoller
-    printf("(%d)Not 10 TWD",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //56RecommandExecption
-    printf("(%d)Recommand Exception",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //57PriExecption
-    printf("(%d)Privileged Exception",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //58Daytrade
-    printf("(%d)Daytrade",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //59FlatSell
-    printf("(%d)Flat Sell",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //60FlatBarrow
-    printf("(%d)Flat Borrow",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //61StockSec
-    printf("(%d)Stock Second",k-42);
-    printBCD(fptr,BCDMask(k,3,pkt_data));
+    printBCD(BCDMask(k,3,pkt_data),outbuffer);
 
     //64WarrantCode
-    printf("(%d)Warrant Code",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //65StrikePrice
-    printf("(%d)Strike Price",k-42);
-    printSPF(fptr,BCDMask(k,5,pkt_data));
+    printSPF(BCDMask(k,5,pkt_data),outbuffer);
 
     //70LastStrikeNum
-    printf("(%d)Last Strike Num",k-42);
-    printBCD(fptr,BCDMask(k,5,pkt_data));
+    printBCD(BCDMask(k,5,pkt_data),outbuffer);
 
     //75LastWriteOff
-    printf("(%d)Last Write Off",k-42);
-    printBCD(fptr,BCDMask(k,5,pkt_data));
+    printBCD(BCDMask(k,5,pkt_data),outbuffer);
 
     //80OpenBalance
-    printf("(%d)Open Balance",k-42);
-    printBCD(fptr,BCDMask(k,5,pkt_data));
+    printBCD(BCDMask(k,5,pkt_data),outbuffer);
 
     //85PerformPercent
-    printf("(%d)Perform Percent",k-42);
-    printBCD(fptr,BCDMask(k,4,pkt_data));
+    printBCD(BCDMask(k,4,pkt_data),outbuffer);
 
     //89PriceUpperBound
-    printf("(%d)Price Upper Bound",k-42);
-    printSPF(fptr,BCDMask(k,5,pkt_data));
+    printSPF(BCDMask(k,5,pkt_data),outbuffer);
 
     //94PriceLowerBound
-    printf("(%d)Price Lower Bound",k-42);
-    printSPF(fptr,BCDMask(k,5,pkt_data));
+    printSPF(BCDMask(k,5,pkt_data),outbuffer);
 
     //99DateDue
-    printf("(%d)Date Due",k-42);
-    printBCD(fptr,BCDMask(k,4,pkt_data));
+    printBCD(BCDMask(k,4,pkt_data),outbuffer);
 
     //103ForeignStock
-    printf("(%d)ForeignStock",k-42);
-    printchar(fptr,k,1,pkt_data);
+    printchar(k,1,pkt_data,outbuffer);
 
     //104BoardLot
-    printf("(%d)BoardLot",k-42);
-    printBCD(fptr,BCDMask(k,3,pkt_data));
+    printBCD(BCDMask(k,3,pkt_data),outbuffer);
 
     //107CurrencyCode
-    printf("(%d)Currency Code",k-42);
-    printchar(fptr,k,3,pkt_data);
+    printchar(k,3,pkt_data,outbuffer);
 
     //110MarketInfo
-    printf("(%d)Market Information",k-42);
-    printhex(fptr,k,1,pkt_data);
+    printhex(k,1,pkt_data,outbuffer);
 
     //111CheckCode
-    printf("(%d)Check Code(Xor)",k-42);
-    printhex(fptr,k,1,pkt_data);
+    printhex(k,1,pkt_data,outbuffer);
 
     //112TerminalCode
-    printf("(%d)Terminal Code",k-42);
-    printhex(fptr,k,2,pkt_data);
+    printhex(k,2,pkt_data,outbuffer);
 
-    fprintf(fptr,"\n");
+    pthread_mutex_lock(&mutex01);
+    fprintf(fptr,"%s\n",outbuffer);
+    /*printf("buffer = %s\n",outbuffer);
     printf("Len : %d\n",header->caplen-42);
-    printf("\n");
+    printf("\n");*/
+    pthread_mutex_unlock(&mutex01);
 }
+

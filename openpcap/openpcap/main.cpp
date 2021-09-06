@@ -3,12 +3,25 @@
 #include <QDebug>
 #include <pcap.h>
 #include <fstream>
+#include <pthread.h>
 #include "print.cpp"
 #include "format01.cpp"
 #include "format21.cpp"
 #include "format22.cpp"
 
 using namespace std;
+
+int x=1,y=1,z=0;
+FILE *fptr01 = fopen("/root/20210823/Format01.csv","w"); //
+FILE *fptr21 = fopen("/root/20210823/Format21.csv","w");
+FILE *fptr22 = fopen("/root/20210823/Format22.csv","w");
+char oriroot[] = "/root/20210823/p";
+
+pthread_mutex_t Filemutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex01 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex21 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex22 = PTHREAD_MUTEX_INITIALIZER;
+
 void Head(int *th,const u_char* pkt_data)
 {
     int h=42;
@@ -42,20 +55,16 @@ void Head(int *th,const u_char* pkt_data)
     th[n]=d;
 }
 
-int main(int argc, char *argv[])
+void* run(void* lp)
 {
-    QCoreApplication a(argc, argv);
+    int Num = *(int *)lp;
     char errbuf[PCAP_ERRBUF_SIZE];
-    qDebug()<<"Hi";
-    int x=1,y=1,z=0;
-    char oriroot[] = "/root/20210823/p";
     char buffer[32];
     char root[60];
-    FILE *fptr01 = fopen("/root/20210823/Format01.csv","w");
-    FILE *fptr21 = fopen("/root/20210823/Format21.csv","w");
-    FILE *fptr22 = fopen("/root/20210823/Format22.csv","w");
+
     while(x<=3)
     {
+        pthread_mutex_lock(&Filemutex);
         strcpy(root,oriroot);
         sprintf(buffer,"%d",x);
         strcat(root,buffer);
@@ -77,22 +86,24 @@ int main(int argc, char *argv[])
             {
                 x=3;
                 y=1;
+                pthread_mutex_unlock(&Filemutex);
             }
             else if(y==1)
             {
                 y++;
+                pthread_mutex_unlock(&Filemutex);
             }
             else
             {
+                pthread_mutex_unlock(&Filemutex);
                 break;
             }
         }
         else
         {
-            printf("Load %s success\n",root);
-
+            printf("%d Load %s success\n",Num,root);
             z++;
-
+            pthread_mutex_unlock(&Filemutex);
             struct pcap_pkthdr *header;
             const u_char *pkt_data;
             int res;
@@ -104,11 +115,6 @@ int main(int argc, char *argv[])
                 {
                     int TH[6]; //TWSE_HEADER
                     Head(TH,pkt_data);
-                    /*for(int i=0;i<6;i++)
-                    {
-                        printf("%d ",TH[i]);
-                    }
-                    printf("\n");*/
                     if(TH[1]==114 && TH[3]==1)
                     {
                         format01(header,pkt_data,fptr01);
@@ -121,14 +127,34 @@ int main(int argc, char *argv[])
                     {
                         format22(header,pkt_data,fptr22);
                     }
-                    w++;
-                    /*if(w>500)
-                        break;*/
                 }
+                w++;
+                /*if(w>500)
+                    break;*/
             }
             pcap_close(fin);
         }
     }
+    pthread_exit(NULL);
+}
+
+
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+    printf("Hi\n");
+    pthread_t t[5];
+    for(int i=0;i<5;i++)
+    {
+        pthread_create(&t[i],NULL,run,(void*) &i);
+    }
+
+    for(int i=0;i<5;i++)
+    {
+        pthread_join(t[i],NULL);
+    }
+
     fclose(fptr01);
     fclose(fptr21);
     fclose(fptr22);
