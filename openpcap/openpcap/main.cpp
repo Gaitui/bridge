@@ -4,21 +4,25 @@
 #include <pcap.h>
 #include <fstream>
 #include <pthread.h>
+#include <time.h>
 #include "print.cpp"
 #include "format01.cpp"
+#include "format06.cpp"
 #include "format21.cpp"
 #include "format22.cpp"
 
 using namespace std;
 
-int x=1,y=1,z=0;
-FILE *fptr01 = fopen("/root/20210823/Format01.csv","w"); //
+volatile int x=1,y=1,z=0;
+FILE *fptr01 = fopen("/root/20210823/Format01.csv","w");
+FILE *fptr06 = fopen("/root/20210823/Format06.csv","w");
 FILE *fptr21 = fopen("/root/20210823/Format21.csv","w");
 FILE *fptr22 = fopen("/root/20210823/Format22.csv","w");
 char oriroot[] = "/root/20210823/p";
 
 pthread_mutex_t Filemutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex01 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex06 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex21 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex22 = PTHREAD_MUTEX_INITIALIZER;
 
@@ -119,6 +123,10 @@ void* run(void* lp)
                     {
                         format01(header,pkt_data,fptr01);
                     }
+                    else if(TH[1]<=131 && TH[1]>=32 && TH[3]==6)
+                    {
+                        format06(header,pkt_data,fptr06,TH[1]);
+                    }
                     else if(TH[1]==116 &&TH[3]==21)
                     {
                         format21(header,pkt_data,fptr21);
@@ -142,6 +150,8 @@ void* run(void* lp)
 
 int main(int argc, char *argv[])
 {
+    clock_t start,stop;
+    start=clock();
     QCoreApplication a(argc, argv);
     printf("Hi\n");
     pthread_t t[5];
@@ -156,8 +166,10 @@ int main(int argc, char *argv[])
     }
 
     fclose(fptr01);
+    fclose(fptr06);
     fclose(fptr21);
     fclose(fptr22);
-    printf("Done\n");
+    stop=clock();
+    printf("Done time : %.2f\n",(double)(stop-start)/CLOCKS_PER_SEC);
     return a.exec();
 }

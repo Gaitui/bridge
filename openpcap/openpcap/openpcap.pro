@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     print.cpp \
     format01.cpp \
     format22.cpp \
-    format21.cpp
+    format21.cpp \
+    format06.cpp
 
 INCLUDEPATH += "tmp/libpcap/include"
 

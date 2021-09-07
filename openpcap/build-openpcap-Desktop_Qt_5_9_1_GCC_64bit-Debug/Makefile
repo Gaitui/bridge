@@ -727,6 +727,7 @@ main.o: ../openpcap/main.cpp /opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/QCoreAppli
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
 		../openpcap/print.cpp \
 		../openpcap/format01.cpp \
+		../openpcap/format06.cpp \
 		../openpcap/format21.cpp \
 		../openpcap/format22.cpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../openpcap/main.cpp

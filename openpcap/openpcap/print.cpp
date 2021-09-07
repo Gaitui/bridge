@@ -61,6 +61,27 @@ void printName(int &k,int n,const u_char* pkt_data,char *outbuffer)
     return;
 }
 
+void printbin(int &k,int n,const u_char* pkt_data,char *outbuffer)
+{
+    for(int z=0;z<n;z++)
+    {
+        for(int i=7;i>=0;i--)
+        {
+            if(pkt_data[z+k] & (1<<i))
+            {
+                strcat(outbuffer,"1");
+            }
+            else
+            {
+                strcat(outbuffer,"0");
+            }
+        }
+        strcat(outbuffer,",");
+    }
+    k+=n;
+    return;
+}
+
 
 int BCDMask(int &k,int n,const u_char* pkt_data)
 {
