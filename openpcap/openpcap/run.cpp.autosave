@@ -1,0 +1,49 @@
+#include <queue>
+#include <fstream>
+#include <pthread.h>
+
+#include "data.h"
+#include "head.h"
+#include "tool.cpp"
+
+extern bool havefile;
+extern std::queue<data> indata;
+
+static void* run(void *lp)
+{
+    FILE *fptrtest = fopen("/root/20210823/test.txt","w");
+    while(1)
+    {
+        if(indata.empty())
+        {
+            if(!havefile)
+            {
+                break;
+            }
+            else
+            {
+                continue;
+            }
+        }
+        else
+        {
+            data d = indata.front();
+            indata.pop();
+            if(d.pkt_data[42]==27)
+            {
+                Head dhead = decodeHead(d.pkt_data);
+                fprintf(fptrtest,"%d,%04d,%02d,%02d,%02d,%08d\n",dhead.esc,dhead.mlen,dhead.mtype,
+                        dhead.mcode,dhead.mver,dhead.mseq);
+
+            }
+            /*for(int i=0;i<d.len;i++)
+            {
+                fprintf(fptrtest,"%3d:%02d ",i,d.pkt_data[i]);
+            }
+            fprintf(fptrtest,"\n");*/
+        }
+
+    }
+    fclose(fptrtest);
+    pthread_exit(NULL);
+}
