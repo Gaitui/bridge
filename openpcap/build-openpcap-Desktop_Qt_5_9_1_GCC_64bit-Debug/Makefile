@@ -229,7 +229,19 @@ DIST          = /opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/exceptions.prf \
 		/opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/yacc.prf \
 		/opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/lex.prf \
-		../openpcap/openpcap.pro  ../openpcap/main.cpp
+		../openpcap/openpcap.pro ../openpcap/data.h \
+		../openpcap/head.h \
+		../openpcap/twse01.h \
+		../openpcap/trans.h \
+		../openpcap/twse21.h \
+		../openpcap/twse22.h \
+		../openpcap/twse06.h \
+		../openpcap/twse23.h \
+		../openpcap/tpex01.h \
+		../openpcap/tpex06.h \
+		../openpcap/tpex21.h \
+		../openpcap/tpex22.h \
+		../openpcap/tpex23.h ../openpcap/main.cpp
 QMAKE_TARGET  = openpcap
 DESTDIR       = 
 TARGET        = openpcap
@@ -615,6 +627,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /opt/Qt5.9.1/5.9.1/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../openpcap/data.h ../openpcap/head.h ../openpcap/twse01.h ../openpcap/trans.h ../openpcap/twse21.h ../openpcap/twse22.h ../openpcap/twse06.h ../openpcap/twse23.h ../openpcap/tpex01.h ../openpcap/tpex06.h ../openpcap/tpex21.h ../openpcap/tpex22.h ../openpcap/tpex23.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../openpcap/main.cpp $(DISTDIR)/
 
 
@@ -710,26 +723,21 @@ main.o: ../openpcap/main.cpp /opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/QCoreAppli
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontainerfwd.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qobject_impl.h \
 		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qeventloop.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/QDebug \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qdebug.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qhash.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qmap.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qtextstream.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qiodevice.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qlocale.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvariant.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qshareddata.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qvector.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qpoint.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qset.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qcontiguouscache.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer.h \
-		/opt/Qt5.9.1/5.9.1/gcc_64/include/QtCore/qsharedpointer_impl.h \
-		../openpcap/print.cpp \
-		../openpcap/format01.cpp \
-		../openpcap/format06.cpp \
-		../openpcap/format21.cpp \
-		../openpcap/format22.cpp
+		../openpcap/read.cpp \
+		../openpcap/data.h \
+		../openpcap/head.h \
+		../openpcap/trans.h \
+		../openpcap/run.cpp \
+		../openpcap/twse01.h \
+		../openpcap/twse06.h \
+		../openpcap/twse21.h \
+		../openpcap/twse22.h \
+		../openpcap/twse23.h \
+		../openpcap/tpex01.h \
+		../openpcap/tpex06.h \
+		../openpcap/tpex21.h \
+		../openpcap/tpex22.h \
+		../openpcap/tpex23.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../openpcap/main.cpp
 
 ####### Install

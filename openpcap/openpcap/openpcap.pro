@@ -10,14 +10,8 @@ CONFIG -= app_bundle
 TEMPLATE = app
 
 SOURCES += main.cpp \
-    print.cpp \
-    format01.cpp \
-    format22.cpp \
-    format21.cpp \
-    format06.cpp \
     run.cpp \
-    read.cpp \
-    tool.cpp
+    read.cpp
 
 INCLUDEPATH += "tmp/libpcap/include"
 
@@ -37,4 +31,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 HEADERS += \
     data.h \
     head.h \
-    twse_isbd.h
+    twse01.h \
+    trans.h \
+    twse21.h \
+    twse22.h \
+    twse06.h \
+    twse23.h \
+    tpex01.h \
+    tpex06.h \
+    tpex21.h \
+    tpex22.h \
+    tpex23.h
