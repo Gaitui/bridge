@@ -13,7 +13,7 @@ extern std::queue<data> indata;
 static void* read(void* lp)
 {
     int z=0;
-    char oriroot[] = "/root/20210823/p1p2.pcap";
+    char oriroot[] = "/root/20210823/p1p1.pcap";
     char errbuf[PCAP_ERRBUF_SIZE];
     char root[60];
     char buffer[32];
@@ -38,18 +38,43 @@ static void* read(void* lp)
             z++;
             struct pcap_pkthdr *header;
             const u_char *pkt_data;
+            int port;
             int res;
             while(res = pcap_next_ex(fin,&header,&pkt_data) >=0)
             {
-                data newdata;
-                newdata.len = (int)header->caplen;
-                newdata.pkt_data = new u_char[newdata.len];
-                for(int i=0;i<newdata.len;i++)
+                port = (int)pkt_data[3];
+                if(port!=0x02)
                 {
-                    newdata.pkt_data[i]=pkt_data[i];
+                    int h=0;
+                    int len = (int)header->caplen;
+                    while(h<len)
+                    {
+                        if(pkt_data[h]==27)
+                        {
+                            if(h+10<=len)
+                            {
+                                Head dhead = decodeHead((u_char*)pkt_data,h);
+                                //printf("%02d\n",dhead.mlen);
+                                if(h+dhead.mlen<=len && pkt_data[h+dhead.mlen-2]==0x0d && pkt_data[h+dhead.mlen-1]==0x0a)
+                                {
+                                    //printf("%02d\n",dhead.mcode);
+                                    data newdata;
+                                    newdata.head = dhead;
+                                    newdata.pkt_data = new u_char[dhead.mlen];
+                                    for(int i=0;i<dhead.mlen;i++)
+                                    {
+                                        newdata.pkt_data[i]=pkt_data[h+i];
+                                    }
+                                    while(indata.size()>10);
+                                    indata.push(newdata);
+                                    h+=dhead.mlen-1;
+                                }
+
+                            }
+                        }
+                        h++;
+                    }
                 }
-                while(indata.size()>10);
-                indata.push(newdata);
             }
             pcap_close(fin);
         }

@@ -41,67 +41,61 @@ static void* run(void *lp)
             data temp = indata.front();
             indata.pop();
             int h = 0;
-            h+=42;
-            if(temp.pkt_data[h]==27)
+            if(temp.head.mtype==1)
             {
-                Head dhead = decodeHead(temp.pkt_data,h);
-                if(dhead.mtype==1)
+                if(temp.head.mcode==1)
                 {
-                    if(dhead.mcode==1)
-                    {
-                        TWSE01 twse01 = decodeTWSE01(h,temp.pkt_data,dhead);
-                        printTWSE01(fptrTWSE01,twse01);
-                    }
-                    else if(dhead.mcode==6)
-                    {
-                        TWSE06 twse06 = decodeTWSE06(h,temp.pkt_data,dhead);
-                        printTWSE06(fptrTWSE06,twse06);
-                    }
-                    else if(dhead.mcode==21)
-                    {
-                        TWSE21 twse21 = decodeTWSE21(h,temp.pkt_data,dhead);
-                        printTWSE21(fptrTWSE21,twse21);
-                    }
-                    else if(dhead.mcode==22)
-                    {
-                        TWSE22 twse22 = decodeTWSE22(h,temp.pkt_data,dhead);
-                        printTWSE22(fptrTWSE22,twse22);
-                    }
-                    else if(dhead.mcode==23)
-                    {
-                        TWSE23 twse23 = decodeTWSE23(h,temp.pkt_data,dhead);
-                        printTWSE23(fptrTWSE23,twse23);
-                    }
+                    TWSE01 twse01 = decodeTWSE01(h,temp.pkt_data,temp.head);
+                    printTWSE01(fptrTWSE01,twse01);
                 }
-                else if(dhead.mtype==2)
+                else if(temp.head.mcode==6)
                 {
-                    if(dhead.mcode==1)
-                    {
-                        TPEX01 tpex01 = decodeTPEX01(h,temp.pkt_data,dhead);
-                        printTPEX01(fptrTPEX01,tpex01);
-                    }
-                    else if(dhead.mcode==6)
-                    {
-                        TPEX06 tpex06 = decodeTPEX06(h,temp.pkt_data,dhead);
-                        printTPEX06(fptrTPEX06,tpex06);
-                    }
-                    else if(dhead.mcode==21)
-                    {
-                        TPEX21 tpex21 = decodeTPEX21(h,temp.pkt_data,dhead);
-                        printTPEX21(fptrTPEX21,tpex21);
-                    }
-                    else if(dhead.mcode==22)
-                    {
-                        TPEX22 tpex22 = decodeTPEX22(h,temp.pkt_data,dhead);
-                        printTPEX22(fptrTPEX22,tpex22);
-                    }
-                    else if(dhead.mcode==23)
-                    {
-                        TPEX23 tpex23 = decodeTPEX23(h,temp.pkt_data,dhead);
-                        printTPEX23(fptrTPEX23,tpex23);
-                    }
+                    TWSE06 twse06 = decodeTWSE06(h,temp.pkt_data,temp.head);
+                    printTWSE06(fptrTWSE06,twse06);
                 }
-
+                else if(temp.head.mcode==21)
+                {
+                    TWSE21 twse21 = decodeTWSE21(h,temp.pkt_data,temp.head);
+                    printTWSE21(fptrTWSE21,twse21);
+                }
+                else if(temp.head.mcode==22)
+                {
+                    TWSE22 twse22 = decodeTWSE22(h,temp.pkt_data,temp.head);
+                    printTWSE22(fptrTWSE22,twse22);
+                }
+                else if(temp.head.mcode==23)
+                {
+                    TWSE23 twse23 = decodeTWSE23(h,temp.pkt_data,temp.head);
+                    printTWSE23(fptrTWSE23,twse23);
+                }
+            }
+            else if(temp.head.mtype==2)
+            {
+                if(temp.head.mcode==1)
+                {
+                    TPEX01 tpex01 = decodeTPEX01(h,temp.pkt_data,temp.head);
+                    printTPEX01(fptrTPEX01,tpex01);
+                }
+                else if(temp.head.mcode==6)
+                {
+                    TPEX06 tpex06 = decodeTPEX06(h,temp.pkt_data,temp.head);
+                    printTPEX06(fptrTPEX06,tpex06);
+                }
+                else if(temp.head.mcode==21)
+                {
+                    TPEX21 tpex21 = decodeTPEX21(h,temp.pkt_data,temp.head);
+                    printTPEX21(fptrTPEX21,tpex21);
+                }
+                else if(temp.head.mcode==22)
+                {
+                    TPEX22 tpex22 = decodeTPEX22(h,temp.pkt_data,temp.head);
+                    printTPEX22(fptrTPEX22,tpex22);
+                }
+                else if(temp.head.mcode==23)
+                {
+                    TPEX23 tpex23 = decodeTPEX23(h,temp.pkt_data,temp.head);
+                    printTPEX23(fptrTPEX23,tpex23);
+                }
             }
         }
         else

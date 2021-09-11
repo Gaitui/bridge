@@ -1,8 +1,9 @@
 #ifndef DATA_H
 #define DATA_H
+#include "head.h"
 
 struct data{
-    int len;
+    Head head;
     u_char *pkt_data;
 };
 
