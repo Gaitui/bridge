@@ -7,23 +7,29 @@
 #include "head.h"
 #include "trans.h"
 
-extern bool havefile;
-extern std::queue<data> indata;
+extern char opath[];
 
-static void* read(void* lp)
+extern bool havefile;
+extern std::queue<data> q01;
+extern std::queue<data> q06;
+extern std::queue<data> q21;
+extern std::queue<data> q22;
+extern std::queue<data> q23;
+
+static void* fread(void* lp)
 {
     int z=0;
-    char oriroot[] = "/root/20210823/p1p1.pcap";
     char errbuf[PCAP_ERRBUF_SIZE];
-    char root[60];
-    char buffer[32];
+    char root[60]="";
     while(1)
     {
-        strcpy(root,oriroot);
         if(z!=0)
         {
-            sprintf(buffer,"%d",z);
-            strcat(root,buffer);
+            sprintf(root,"%s.pcap%d",opath,z);
+        }
+        else
+        {
+            sprintf(root,"%s.pcap",opath);
         }
         pcap_t *fin = pcap_open_offline(root,errbuf);
         if(!fin)
@@ -65,8 +71,27 @@ static void* read(void* lp)
                                     {
                                         newdata.pkt_data[i]=pkt_data[h+i];
                                     }
-                                    while(indata.size()>10);
-                                    indata.push(newdata);
+                                    while(q01.size()+q06.size()+q21.size()+q22.size()+q23.size()>15);
+                                    if(dhead.mcode == 1 && port == 0x00)
+                                    {
+                                        q01.push(newdata);
+                                    }
+                                    else if(dhead.mcode == 6)
+                                    {
+                                        q06.push(newdata);
+                                    }
+                                    else if(dhead.mcode == 21)
+                                    {
+                                        q21.push(newdata);
+                                    }
+                                    else if(dhead.mcode == 22)
+                                    {
+                                        q22.push(newdata);
+                                    }
+                                    else if(dhead.mcode == 23)
+                                    {
+                                        q23.push(newdata);
+                                    }
                                     h+=dhead.mlen-1;
                                 }
 

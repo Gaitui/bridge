@@ -17,85 +17,60 @@
 #include "tpex22.h"
 #include "tpex23.h"
 
+extern char opath[];
+
 extern bool havefile;
-extern std::queue<data> indata;
+extern std::queue<data> q01;
+extern std::queue<data> q06;
+extern std::queue<data> q21;
+extern std::queue<data> q22;
+extern std::queue<data> q23;
 
-static void* run(void *lp)
+extern bool TP01;
+extern bool TP06;
+extern bool TP21;
+extern bool TP22;
+extern bool TP23;
+extern bool TW01;
+extern bool TW06;
+extern bool TW21;
+extern bool TW22;
+extern bool TW23;
+
+
+static void* format01(void *lp)
 {
-    FILE *fptrtest = fopen("/root/20210823/test.txt","w");
-    FILE *fptrTWSE01 = fopen("/root/20210823/TWSE01.csv","w");
-    FILE *fptrTWSE06 = fopen("/root/20210823/TWSE06.csv","w");
-    FILE *fptrTWSE21 = fopen("/root/20210823/TWSE21.csv","w");
-    FILE *fptrTWSE22 = fopen("/root/20210823/TWSE22.csv","w");
-    FILE *fptrTWSE23 = fopen("/root/20210823/TWSE23.csv","w");
-    FILE *fptrTPEX01 = fopen("/root/20210823/TPEX01.csv","w");
-    FILE *fptrTPEX06 = fopen("/root/20210823/TPEX06.csv","w");
-    FILE *fptrTPEX21 = fopen("/root/20210823/TPEX21.csv","w");
-    FILE *fptrTPEX22 = fopen("/root/20210823/TPEX22.csv","w");
-    FILE *fptrTPEX23 = fopen("/root/20210823/TPEX23.csv","w");
-
+    FILE *fptrTWSE01;
+    FILE *fptrTPEX01;
+    char root[60];
     while(1)
     {
-        if(!indata.empty())
+        if(!q01.empty())
         {
-            data temp = indata.front();
-            indata.pop();
             int h = 0;
+            data temp = q01.front();
+            q01.pop();
             if(temp.head.mtype==1)
             {
-                if(temp.head.mcode==1)
+                if(!TW01)
                 {
-                    TWSE01 twse01 = decodeTWSE01(h,temp.pkt_data,temp.head);
-                    printTWSE01(fptrTWSE01,twse01);
+                    sprintf(root,"%sTWSE01.csv",opath);
+                    fptrTWSE01 = fopen(root,"w");
+                    TW01 = true;
                 }
-                else if(temp.head.mcode==6)
-                {
-                    TWSE06 twse06 = decodeTWSE06(h,temp.pkt_data,temp.head);
-                    printTWSE06(fptrTWSE06,twse06);
-                }
-                else if(temp.head.mcode==21)
-                {
-                    TWSE21 twse21 = decodeTWSE21(h,temp.pkt_data,temp.head);
-                    printTWSE21(fptrTWSE21,twse21);
-                }
-                else if(temp.head.mcode==22)
-                {
-                    TWSE22 twse22 = decodeTWSE22(h,temp.pkt_data,temp.head);
-                    printTWSE22(fptrTWSE22,twse22);
-                }
-                else if(temp.head.mcode==23)
-                {
-                    TWSE23 twse23 = decodeTWSE23(h,temp.pkt_data,temp.head);
-                    printTWSE23(fptrTWSE23,twse23);
-                }
+                TWSE01 twse01 = decodeTWSE01(h,temp.pkt_data,temp.head);
+                printTWSE01(fptrTWSE01,twse01);
             }
             else if(temp.head.mtype==2)
             {
-                if(temp.head.mcode==1)
+                if(!TP01)
                 {
-                    TPEX01 tpex01 = decodeTPEX01(h,temp.pkt_data,temp.head);
-                    printTPEX01(fptrTPEX01,tpex01);
+                    sprintf(root,"%sTPEX01.csv",opath);
+                    fptrTPEX01 =  fopen(root,"w");
+                    TP01 = true;
                 }
-                else if(temp.head.mcode==6)
-                {
-                    TPEX06 tpex06 = decodeTPEX06(h,temp.pkt_data,temp.head);
-                    printTPEX06(fptrTPEX06,tpex06);
-                }
-                else if(temp.head.mcode==21)
-                {
-                    TPEX21 tpex21 = decodeTPEX21(h,temp.pkt_data,temp.head);
-                    printTPEX21(fptrTPEX21,tpex21);
-                }
-                else if(temp.head.mcode==22)
-                {
-                    TPEX22 tpex22 = decodeTPEX22(h,temp.pkt_data,temp.head);
-                    printTPEX22(fptrTPEX22,tpex22);
-                }
-                else if(temp.head.mcode==23)
-                {
-                    TPEX23 tpex23 = decodeTPEX23(h,temp.pkt_data,temp.head);
-                    printTPEX23(fptrTPEX23,tpex23);
-                }
+                TPEX01 tpex01 = decodeTPEX01(h,temp.pkt_data,temp.head);
+                printTPEX01(fptrTPEX01,tpex01);
             }
         }
         else
@@ -104,16 +79,222 @@ static void* run(void *lp)
                 break;
         }
     }
-    fclose(fptrtest);
-    fclose(fptrTWSE01);
-    fclose(fptrTWSE06);
-    fclose(fptrTWSE21);
-    fclose(fptrTWSE22);
-    fclose(fptrTWSE23);
-    fclose(fptrTPEX01);
-    fclose(fptrTPEX06);
-    fclose(fptrTPEX21);
-    fclose(fptrTPEX22);
-    fclose(fptrTPEX23);
+    if(TW01)
+    {
+        fclose(fptrTWSE01);
+    }
+    if(TP01)
+    {
+        fclose(fptrTPEX01);
+    }
     pthread_exit(NULL);
 }
+
+static void* format06(void *lp)
+{
+    FILE *fptrTWSE06;
+    FILE *fptrTPEX06;
+    char root[60];
+    while(1)
+    {
+        if(!q06.empty())
+        {
+            int h = 0;
+            data temp = q06.front();
+            q06.pop();
+            if(temp.head.mtype==1)
+            {
+                if(!TW06)
+                {
+                    sprintf(root,"%sTWSE06.csv",opath);
+                    fptrTWSE06 = fopen(root,"w");
+                    TW06 = true;
+                }
+                TWSE06 twse06 = decodeTWSE06(h,temp.pkt_data,temp.head);
+                printTWSE06(fptrTWSE06,twse06);
+            }
+            else if(temp.head.mtype==2)
+            {
+                if(!TP06)
+                {
+                    sprintf(root,"%sTPEX06.csv",opath);
+                    fptrTPEX06 =  fopen(root,"w");
+                    TP06 = true;
+                }
+                TPEX06 tpex06 = decodeTPEX06(h,temp.pkt_data,temp.head);
+                printTPEX06(fptrTPEX06,tpex06);
+            }
+        }
+        else
+        {
+            if(!havefile)
+                break;
+        }
+    }
+    if(TW06)
+    {
+        fclose(fptrTWSE06);
+    }
+    if(TP06)
+    {
+        fclose(fptrTPEX06);
+    }
+    pthread_exit(NULL);
+}
+
+static void* format21(void *lp)
+{
+    FILE *fptrTWSE21;
+    FILE *fptrTPEX21;
+    char root[60];
+    while(1)
+    {
+        if(!q21.empty())
+        {
+            int h = 0;
+            data temp = q21.front();
+            q21.pop();
+            if(temp.head.mtype==1)
+            {
+                if(!TW21)
+                {
+                    sprintf(root,"%sTWSE21.csv",opath);
+                    fptrTWSE21 = fopen(root,"w");
+                    TW21 = true;
+                }
+                TWSE21 twse21 = decodeTWSE21(h,temp.pkt_data,temp.head);
+                printTWSE21(fptrTWSE21,twse21);
+            }
+            else if(temp.head.mtype==2)
+            {
+                if(!TP21)
+                {
+                    sprintf(root,"%sTPEX21.csv",opath);
+                    fptrTPEX21 =  fopen(root,"w");
+                    TP21 = true;
+                }
+                TPEX21 tpex21 = decodeTPEX21(h,temp.pkt_data,temp.head);
+                printTPEX21(fptrTPEX21,tpex21);
+            }
+        }
+        else
+        {
+            if(!havefile)
+                break;
+        }
+    }
+    if(TW21)
+    {
+        fclose(fptrTWSE21);
+    }
+    if(TP21)
+    {
+        fclose(fptrTPEX21);
+    }
+    pthread_exit(NULL);
+}
+
+static void* format22(void *lp)
+{
+    FILE *fptrTWSE22;
+    FILE *fptrTPEX22;
+    char root[60];
+    while(1)
+    {
+        if(!q22.empty())
+        {
+            int h = 0;
+            data temp = q22.front();
+            q22.pop();
+            if(temp.head.mtype==1)
+            {
+                if(!TW22)
+                {
+                    sprintf(root,"%sTWSE22.csv",opath);
+                    fptrTWSE22 = fopen(root,"w");
+                    TW22 = true;
+                }
+                TWSE22 twse22 = decodeTWSE22(h,temp.pkt_data,temp.head);
+                printTWSE22(fptrTWSE22,twse22);
+            }
+            else if(temp.head.mtype==2)
+            {
+                if(!TP22)
+                {
+                    sprintf(root,"%sTPEX22.csv",opath);
+                    fptrTPEX22 =  fopen(root,"w");
+                    TP22 = true;
+                }
+                TPEX22 tpex22 = decodeTPEX22(h,temp.pkt_data,temp.head);
+                printTPEX22(fptrTPEX22,tpex22);
+            }
+        }
+        else
+        {
+            if(!havefile)
+                break;
+        }
+    }
+    if(TW22)
+    {
+        fclose(fptrTWSE22);
+    }
+    if(TP22)
+    {
+        fclose(fptrTPEX22);
+    }
+    pthread_exit(NULL);
+}
+
+static void* format23(void *lp)
+{
+    FILE *fptrTWSE23;
+    FILE *fptrTPEX23;
+    char root[60];
+    while(1)
+    {
+        if(!q23.empty())
+        {
+            int h = 0;
+            data temp = q23.front();
+            q23.pop();
+            if(temp.head.mtype==1)
+            {
+                if(!TW23)
+                {
+                    sprintf(root,"%sTWSE23.csv",opath);
+                    fptrTWSE23 = fopen(root,"w");
+                    TW23 = true;
+                }
+                TWSE23 twse23 = decodeTWSE23(h,temp.pkt_data,temp.head);
+                printTWSE23(fptrTWSE23,twse23);
+            }
+            else if(temp.head.mtype==2)
+            {
+                if(!TP23)
+                {
+                    sprintf(root,"%sTPEX23.csv",opath);
+                    fptrTPEX23 =  fopen(root,"w");
+                    TP23 = true;
+                }
+                TPEX23 tpex23 = decodeTPEX23(h,temp.pkt_data,temp.head);
+                printTPEX23(fptrTPEX23,tpex23);
+            }
+        }
+        else
+        {
+            if(!havefile)
+                break;
+        }
+    }
+    if(TW23)
+    {
+        fclose(fptrTWSE23);
+    }
+    if(TP23)
+    {
+        fclose(fptrTPEX23);
+    }
+    pthread_exit(NULL);
+}
+
