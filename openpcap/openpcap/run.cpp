@@ -28,6 +28,8 @@ extern std::queue<data> q23;
 
 extern std::vector<int> tw06info;
 extern std::vector<int> tp06info;
+extern std::vector<int> tw23info;
+extern std::vector<int> tp23info;
 
 extern bool TP01;
 extern bool TP06;
@@ -301,6 +303,10 @@ static void* format23(void *lp)
 {
     FILE *fptrTWSE23;
     FILE *fptrTPEX23;
+    bool twstart=false;
+    bool tpstart=false;
+    int twchseq;
+    int tpchseq;
     char root[60];
     while(1)
     {
@@ -318,7 +324,26 @@ static void* format23(void *lp)
                     TW23 = true;
                 }
                 TWSE23 twse23 = decodeTWSE23(h,temp.pkt_data,temp.head);
-                printTWSE23(fptrTWSE23,twse23,temp.address,temp.port);
+                if(twse23.mtime>=83000000000 && !twstart)
+                {
+                    twchseq = twse23.head.mseq;
+                    tw23info.push_back(twchseq);
+                    twstart = true;
+                }
+                if(twstart)
+                {
+                    if(twchseq != twse23.head.mseq)
+                    {
+                        for(int i=twchseq;i<twse23.head.mseq;i++)
+                        {
+                            tw23info.push_back(i);
+                            printf("%d\n",i);
+                        }
+                        twchseq = twse23.head.mseq;
+                    }
+                    printTWSE23(fptrTWSE23,twse23,temp.address,temp.port);
+                    twchseq++;
+                }
             }
             else if(temp.head.mtype==2)
             {
@@ -329,7 +354,27 @@ static void* format23(void *lp)
                     TP23 = true;
                 }
                 TPEX23 tpex23 = decodeTPEX23(h,temp.pkt_data,temp.head);
-                printTPEX23(fptrTPEX23,tpex23,temp.address,temp.port);
+                if(tpex23.mtime>=83000000000 && !tpstart)
+                {
+                    tpchseq = tpex23.head.mseq;
+                    tp23info.push_back(tpchseq);
+                    tpstart = true;
+                }
+                if(tpstart)
+                {
+                    if(tpchseq != tpex23.head.mseq)
+                    {
+                        for(int i=tpchseq;i<tpex23.head.mseq;i++)
+                        {
+                            tp23info.push_back(i);
+                            printf("%d\n",i);
+                        }
+                        tpchseq = tpex23.head.mseq;
+                    }
+                    printTPEX23(fptrTPEX23,tpex23,temp.address,temp.port);
+                    tpchseq++;
+                }
+
             }
         }
         else
@@ -338,6 +383,10 @@ static void* format23(void *lp)
                 break;
         }
     }
+    if(twstart)
+      tw23info.push_back(twchseq-1);
+    if(tpstart)
+      tp23info.push_back(tpchseq-1);
     if(TW23)
     {
         fclose(fptrTWSE23);

@@ -8,7 +8,7 @@
 #include "read.cpp"
 #include "run.cpp"
 
-char opath[] = "/root/20210823/p1p2";
+char opath[] = "/root/20210823/p1p1";
 
 bool havefile = true;
 std::queue<data> q01;
@@ -19,6 +19,8 @@ std::queue<data> q23;
 
 std::vector<int> tw06info;
 std::vector<int> tp06info;
+std::vector<int> tw23info;
+std::vector<int> tp23info;
 
 bool TP01=false;
 bool TP06=false;
@@ -75,6 +77,24 @@ int main(int argc, char *argv[])
         for(int i=1;i<tp06info.size()-1;i++)
         {
             printf("%d, ",tp06info[i]);
+        }
+        printf("\n");
+    }
+    if(tw23info.size()!=0)
+    {
+        printf("TWSE23 Start : %d ,End : %d, Lost : ",tw23info[0],tw23info[tw23info.size()-1]);
+        for(int i=1;i<tw23info.size()-1;i++)
+        {
+            printf("%d, ",tw23info[i]);
+        }
+        printf("\n");
+    }
+    if(tp23info.size()!=0)
+    {
+        printf("TPEx23 Start : %d ,End : %d, Lost : ",tp23info[0],tp23info[tp23info.size()-1]);
+        for(int i=1;i<tp23info.size()-1;i++)
+        {
+            printf("%d, ",tp23info[i]);
         }
         printf("\n");
     }
