@@ -44,10 +44,18 @@ TWSE06 decodeTWSE06(int h,u_char *pkt_data,Head head)
     return temp;
 }
 
-void printTWSE06(FILE *fptr,TWSE06 tw)
+void printTWSE06(FILE *fptr,TWSE06 tw,std::vector<int>address,int port)
 {
     char outbuffer[500]="";
     char tempbuffer[50];
+
+    for(int i=0;i<address.size();i++)
+    {
+        sprintf(tempbuffer,"%d,",address[i]);
+        strcat(outbuffer,tempbuffer);
+    }
+    sprintf(tempbuffer,"%d,",port);
+    strcat(outbuffer,tempbuffer);
 
     //head
     sprintf(tempbuffer,"%02d,",tw.head.esc);

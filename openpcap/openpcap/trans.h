@@ -1,6 +1,7 @@
 #ifndef TRANS_H
 #define TRANS_H
 
+
 long long BCDtoD(int &h,int n,u_char* pkt_data)
 {
     long long d=0;

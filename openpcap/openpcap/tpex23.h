@@ -1,5 +1,6 @@
 #ifndef TPEX23_H
 #define TPEX23_H
+#include <vector>
 
 struct TPEX23{
     //Header
@@ -43,10 +44,18 @@ TPEX23 decodeTPEX23(int h,u_char *pkt_data,Head head)
     return temp;
 }
 
-void printTPEX23(FILE *fptr,TPEX23 tw)
+void printTPEX23(FILE *fptr,TPEX23 tw,std::vector<int> address,int port)
 {
     char outbuffer[500]="";
     char tempbuffer[50];
+
+    for(int i=0;i<address.size();i++)
+    {
+        sprintf(tempbuffer,"%d,",address[i]);
+        strcat(outbuffer,tempbuffer);
+    }
+    sprintf(tempbuffer,"%d,",port);
+    strcat(outbuffer,tempbuffer);
 
     //head
     sprintf(tempbuffer,"%02d,",tw.head.esc);

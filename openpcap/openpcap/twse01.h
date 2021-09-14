@@ -1,5 +1,6 @@
 #ifndef TWSE_ISBD_H
 #define TWSE_ISBD_H
+#include <vector>
 
 struct TWSE01{
     //Header
@@ -81,10 +82,19 @@ TWSE01 decodeTWSE01(int h,u_char *pkt_data,Head head)
     return temp;
 }
 
-void printTWSE01(FILE *fptr,TWSE01 tw)
+void printTWSE01(FILE *fptr,TWSE01 tw,std::vector<int> address,int port)
 {
     char outbuffer[500]="";
     char tempbuffer[50];
+
+
+    for(int i=0;i<address.size();i++)
+    {
+        sprintf(tempbuffer,"%d,",address[i]);
+        strcat(outbuffer,tempbuffer);
+    }
+    sprintf(tempbuffer,"%d,",port);
+    strcat(outbuffer,tempbuffer);
 
     //head
     sprintf(tempbuffer,"%02d,",tw.head.esc);

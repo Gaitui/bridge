@@ -44,12 +44,13 @@ static void* fread(void* lp)
             z++;
             struct pcap_pkthdr *header;
             const u_char *pkt_data;
-            int port;
+            int addressbyte;
+            //int port;
             int res;
             while(res = pcap_next_ex(fin,&header,&pkt_data) >=0)
             {
-                port = (int)pkt_data[3];
-                if(port!=0x02)
+                addressbyte = (int)pkt_data[31];
+                if(addressbyte!=0x02)
                 {
                     int h=0;
                     int len = (int)header->caplen;
@@ -63,17 +64,24 @@ static void* fread(void* lp)
                                 //printf("%02d\n",dhead.mlen);
                                 if(h+dhead.mlen<=len && pkt_data[h+dhead.mlen-2]==0x0d && pkt_data[h+dhead.mlen-1]==0x0a)
                                 {
-                                    //printf("%02d\n",dhead.mcode);
+                                    //port = (pkt_data[36]<<8)+pkt_data[37];
+                                    //printf("%d\n",port);
                                     data newdata;
+                                    newdata.port=(pkt_data[36]<<8)+pkt_data[37];
+                                    for(int i=30;i<34;i++)
+                                    {
+                                        newdata.address.push_back(pkt_data[i]);
+                                    }
                                     newdata.head = dhead;
                                     newdata.pkt_data = new u_char[dhead.mlen];
                                     for(int i=0;i<dhead.mlen;i++)
                                     {
                                         newdata.pkt_data[i]=pkt_data[h+i];
                                     }
-                                    while(q01.size()+q06.size()+q21.size()+q22.size()+q23.size()>15);
-                                    if(dhead.mcode == 1 && port == 0x00)
+                                    while(q01.size()+q06.size()+q21.size()+q22.size()+q23.size()>5);
+                                    if(dhead.mcode == 1 && addressbyte == 0x00)
                                     {
+                                        //printf("%02d\n",addressbyte);
                                         q01.push(newdata);
                                     }
                                     else if(dhead.mcode == 6)
@@ -92,7 +100,7 @@ static void* fread(void* lp)
                                     {
                                         q23.push(newdata);
                                     }
-                                    h+=dhead.mlen-1;
+                                    //h+=dhead.mlen-1;
                                 }
 
                             }

@@ -1,5 +1,6 @@
 #ifndef TPEX22_H
 #define TPEX22_H
+#include <vector>
 
 struct TPEX22{
     //Header
@@ -41,10 +42,18 @@ TPEX22 decodeTPEX22(int h,u_char *pkt_data,Head head)
     return temp;
 }
 
-void printTPEX22(FILE *fptr,TPEX22 tw)
+void printTPEX22(FILE *fptr,TPEX22 tw,std::vector<int> address,int port)
 {
     char outbuffer[500]="";
     char tempbuffer[50];
+
+    for(int i=0;i<address.size();i++)
+    {
+        sprintf(tempbuffer,"%d,",address[i]);
+        strcat(outbuffer,tempbuffer);
+    }
+    sprintf(tempbuffer,"%d,",port);
+    strcat(outbuffer,tempbuffer);
 
     //head
     sprintf(tempbuffer,"%02d,",tw.head.esc);

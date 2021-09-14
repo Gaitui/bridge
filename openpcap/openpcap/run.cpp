@@ -26,6 +26,9 @@ extern std::queue<data> q21;
 extern std::queue<data> q22;
 extern std::queue<data> q23;
 
+extern std::vector<int> tw06info;
+extern std::vector<int> tp06info;
+
 extern bool TP01;
 extern bool TP06;
 extern bool TP21;
@@ -59,7 +62,7 @@ static void* format01(void *lp)
                     TW01 = true;
                 }
                 TWSE01 twse01 = decodeTWSE01(h,temp.pkt_data,temp.head);
-                printTWSE01(fptrTWSE01,twse01);
+                printTWSE01(fptrTWSE01,twse01,temp.address,temp.port);
             }
             else if(temp.head.mtype==2)
             {
@@ -70,7 +73,7 @@ static void* format01(void *lp)
                     TP01 = true;
                 }
                 TPEX01 tpex01 = decodeTPEX01(h,temp.pkt_data,temp.head);
-                printTPEX01(fptrTPEX01,tpex01);
+                printTPEX01(fptrTPEX01,tpex01,temp.address,temp.port);
             }
         }
         else
@@ -95,6 +98,12 @@ static void* format06(void *lp)
     FILE *fptrTWSE06;
     FILE *fptrTPEX06;
     char root[60];
+    bool twstart=false;
+    bool tpstart=false;
+    int twchseq;
+    int tpchseq;
+    TWSE06 twse06;
+    TPEX06 tpex06;
     while(1)
     {
         if(!q06.empty())
@@ -110,8 +119,27 @@ static void* format06(void *lp)
                     fptrTWSE06 = fopen(root,"w");
                     TW06 = true;
                 }
-                TWSE06 twse06 = decodeTWSE06(h,temp.pkt_data,temp.head);
-                printTWSE06(fptrTWSE06,twse06);
+                twse06 = decodeTWSE06(h,temp.pkt_data,temp.head);
+                if(twse06.mtime>=83000000000 && !twstart)
+                {
+                    twchseq = twse06.head.mseq;
+                    tw06info.push_back(twchseq);
+                    twstart = true;
+                }
+                if(twstart)
+                {
+                    if(twchseq != twse06.head.mseq)
+                    {
+                        for(int i=twchseq;i<twse06.head.mseq;i++)
+                        {
+                            tw06info.push_back(i);
+                            printf("%d\n",i);
+                        }
+                        twchseq = twse06.head.mseq;
+                    }
+                    printTWSE06(fptrTWSE06,twse06,temp.address,temp.port);
+                    twchseq++;
+                }
             }
             else if(temp.head.mtype==2)
             {
@@ -121,8 +149,27 @@ static void* format06(void *lp)
                     fptrTPEX06 =  fopen(root,"w");
                     TP06 = true;
                 }
-                TPEX06 tpex06 = decodeTPEX06(h,temp.pkt_data,temp.head);
-                printTPEX06(fptrTPEX06,tpex06);
+                tpex06 = decodeTPEX06(h,temp.pkt_data,temp.head);
+                if(tpex06.mtime>=83000000000 && !tpstart)
+                {
+                    tpchseq = tpex06.head.mseq;
+                    tp06info.push_back(tpchseq);
+                    tpstart = true;
+                }
+                if(tpstart)
+                {
+                    if(tpchseq != tpex06.head.mseq)
+                    {
+                        for(int i=tpchseq;i<tpex06.head.mseq;i++)
+                        {
+                            tp06info.push_back(i);
+                            printf("%d\n",i);
+                        }
+                        tpchseq = tpex06.head.mseq;
+                    }
+                    printTPEX06(fptrTPEX06,tpex06,temp.address,temp.port);
+                    tpchseq++;
+                }
             }
         }
         else
@@ -131,6 +178,10 @@ static void* format06(void *lp)
                 break;
         }
     }
+    if(twstart)
+      tw06info.push_back(twse06.head.mseq);
+    if(tpstart)
+      tp06info.push_back(tpex06.head.mseq);
     if(TW06)
     {
         fclose(fptrTWSE06);
@@ -163,7 +214,7 @@ static void* format21(void *lp)
                     TW21 = true;
                 }
                 TWSE21 twse21 = decodeTWSE21(h,temp.pkt_data,temp.head);
-                printTWSE21(fptrTWSE21,twse21);
+                printTWSE21(fptrTWSE21,twse21,temp.address,temp.port);
             }
             else if(temp.head.mtype==2)
             {
@@ -174,7 +225,7 @@ static void* format21(void *lp)
                     TP21 = true;
                 }
                 TPEX21 tpex21 = decodeTPEX21(h,temp.pkt_data,temp.head);
-                printTPEX21(fptrTPEX21,tpex21);
+                printTPEX21(fptrTPEX21,tpex21,temp.address,temp.port);
             }
         }
         else
@@ -215,7 +266,7 @@ static void* format22(void *lp)
                     TW22 = true;
                 }
                 TWSE22 twse22 = decodeTWSE22(h,temp.pkt_data,temp.head);
-                printTWSE22(fptrTWSE22,twse22);
+                printTWSE22(fptrTWSE22,twse22,temp.address,temp.port);
             }
             else if(temp.head.mtype==2)
             {
@@ -226,7 +277,7 @@ static void* format22(void *lp)
                     TP22 = true;
                 }
                 TPEX22 tpex22 = decodeTPEX22(h,temp.pkt_data,temp.head);
-                printTPEX22(fptrTPEX22,tpex22);
+                printTPEX22(fptrTPEX22,tpex22,temp.address,temp.port);
             }
         }
         else
@@ -267,7 +318,7 @@ static void* format23(void *lp)
                     TW23 = true;
                 }
                 TWSE23 twse23 = decodeTWSE23(h,temp.pkt_data,temp.head);
-                printTWSE23(fptrTWSE23,twse23);
+                printTWSE23(fptrTWSE23,twse23,temp.address,temp.port);
             }
             else if(temp.head.mtype==2)
             {
@@ -278,7 +329,7 @@ static void* format23(void *lp)
                     TP23 = true;
                 }
                 TPEX23 tpex23 = decodeTPEX23(h,temp.pkt_data,temp.head);
-                printTPEX23(fptrTPEX23,tpex23);
+                printTPEX23(fptrTPEX23,tpex23,temp.address,temp.port);
             }
         }
         else
