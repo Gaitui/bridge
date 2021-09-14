@@ -84,19 +84,19 @@ static void* fread(void* lp)
                                         //printf("%02d\n",addressbyte);
                                         q01.push(newdata);
                                     }
-                                    else if(dhead.mcode == 6)
+                                    else if(dhead.mcode == 6 && addressbyte == 0x00)
                                     {
                                         q06.push(newdata);
                                     }
-                                    else if(dhead.mcode == 21)
+                                    else if(dhead.mcode == 21 && addressbyte == 0x06)
                                     {
                                         q21.push(newdata);
                                     }
-                                    else if(dhead.mcode == 22)
+                                    else if(dhead.mcode == 22 && addressbyte == 0x08)
                                     {
                                         q22.push(newdata);
                                     }
-                                    else if(dhead.mcode == 23)
+                                    else if(dhead.mcode == 23 && addressbyte == 0x08)
                                     {
                                         q23.push(newdata);
                                     }
